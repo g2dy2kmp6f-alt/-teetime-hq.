@@ -1,21 +1,16 @@
 const KEY="teetimeHQ.v1";
-let state=JSON.parse(localStorage.getItem(KEY)||'null')||{friends:[],rounds:[]};
-const DEMO_NAMES=["Mike","John","Dave"];
-if(!localStorage.getItem("teetimeHQ.demoCleanup.v2")){
-  const names=(state.friends||[]).map(f=>f.name);
-  const onlyOriginalDemo=names.length===3 && DEMO_NAMES.every(n=>names.includes(n));
-  if(onlyOriginalDemo) state.friends=[];
-  localStorage.setItem("teetimeHQ.demoCleanup.v2","done");
-  localStorage.setItem(KEY,JSON.stringify(state));
+let state;
+try {
+  state=JSON.parse(localStorage.getItem(KEY)||"null")||{friends:[],rounds:[]};
+} catch(e) {
+  state={friends:[],rounds:[]};
 }
-// One-time cleanup of the original prototype demo friends. Only remove them when
-// the stored friend list exactly matches the untouched demo set.
-const DEMO_NAMES=["Mike","John","Dave"];
-if(!localStorage.getItem("teetimeHQ.demoCleanup.v1") && Array.isArray(state.friends)){
-  const names=state.friends.map(f=>f.name);
-  const untouchedDemo=names.length===3 && DEMO_NAMES.every(n=>names.includes(n));
-  if(untouchedDemo) state.friends=[];
-  localStorage.setItem("teetimeHQ.demoCleanup.v1","done");
+if(!Array.isArray(state.friends)) state.friends=[];
+if(!Array.isArray(state.rounds)) state.rounds=[];
+const originalDemo=["Mike","John","Dave"];
+const names=state.friends.map(f=>f && f.name).filter(Boolean);
+if(names.length===3 && originalDemo.every(n=>names.includes(n))){
+  state.friends=[];
   localStorage.setItem(KEY,JSON.stringify(state));
 }
 const save=()=>localStorage.setItem(KEY,JSON.stringify(state));
@@ -56,10 +51,9 @@ async function loadRoundWeather(r){const el=document.getElementById('forecast-'+
 async function loadWeather(r){const el=document.getElementById('weather');el.innerHTML='⛅ --°<small>Loading forecast…</small>';try{const w=await forecast(r);if(nextCourse.textContent!==r.course)return;el.innerHTML=`${w.icon} ${w.temp}°<small>🌧️ ${w.rain}% · 💨 ${w.wind} mph ${w.direction}</small>`}catch(e){el.innerHTML=`🌤️ --°<small>${e.message}</small>`}}
 
 let deferred;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e});installBtn.onclick=async()=>{if(deferred){deferred.prompt();deferred=null}else alert("On iPhone: tap Share, then Add to Home Screen. On Android: use your browser menu and choose Install/Add to Home screen.")};
-if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js");render();
 function resetAppData(){
-  if(!confirm("Reset TeeTime HQ? This will delete all saved tee times, friends, and app data on this device.")) return;
-  Object.keys(localStorage).filter(k=>k.startsWith("teetimeHQ")).forEach(k=>localStorage.removeItem(k));
-  if("caches" in window) caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))).finally(()=>location.reload());
-  else location.reload();
+  if(!confirm("Reset TeeTime HQ? This deletes all saved tee times and friends on this device.")) return;
+  localStorage.removeItem(KEY);
+  location.reload();
 }
+if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js");render();
