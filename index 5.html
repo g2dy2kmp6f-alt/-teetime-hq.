@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#123c2b"><title>TeeTime HQ</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#f6f3e9;color:#183126;font:15px system-ui,-apple-system,Segoe UI,sans-serif;padding-bottom:82px}header{background:#123c2b;color:white;padding:24px max(20px,calc((100% - 760px)/2));display:flex;justify-content:space-between;align-items:center}h1{margin:2px 0;font-size:27px}h1 b{color:#d9b65d}.eyebrow{font-size:10px;letter-spacing:2px;color:#c7d7cd}header .icon{border:1px solid #537262;background:#234d3a;color:white;border-radius:50%;width:42px;height:42px;font-size:22px}main{max-width:760px;margin:auto;padding:20px}.page{display:none}.page.active{display:block}.hero{background:linear-gradient(135deg,#173f2d,#285b40);color:white;border-radius:22px;padding:24px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 8px 25px #173f2d22}.hero h2{margin:6px 0;font-size:22px}.hero p{margin:0;color:#dce7e0}.hero small{letter-spacing:1.5px}.weather{font-size:28px;text-align:center}.weather small{display:block;font-size:10px;margin-top:4px}.section-title{display:flex;align-items:center;justify-content:space-between;margin:25px 0 10px}.section-title h2,.section-title h3{margin:0}.section-title button,.back{border:0;background:transparent;color:#1b6545;font-weight:700}.card{background:white;border:1px solid #e5e0d2;border-radius:18px;padding:18px;margin:12px 0;box-shadow:0 4px 16px #1831260c}.round-top{display:flex;justify-content:space-between;gap:10px}.round-top h3{margin:0 0 4px}.datebox{background:#edf2ec;border-radius:12px;padding:8px 12px;text-align:center;min-width:62px}.datebox b{display:block;font-size:20px}.players{display:flex;gap:7px;align-items:center;margin:15px 0}.avatar{width:32px;height:32px;border-radius:50%;background:#d9b65d;color:#173f2d;display:grid;place-items:center;font-weight:800}.open{border:1px dashed #8aa093;background:white}.actions{display:flex;gap:8px}.actions button{flex:1;border:1px solid #d9ded9;background:#f9faf8;padding:10px;border-radius:10px;color:#214734;font-weight:650}form label{display:block;font-weight:650;margin:14px 0 6px}input,select{width:100%;border:1px solid #d8d6cd;border-radius:12px;padding:13px;background:white;font:inherit;margin-top:6px}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.primary{width:100%;border:0;border-radius:13px;padding:15px;background:#18583c;color:white;font-weight:800;font-size:16px;margin-top:22px}.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{background:white;border:1px solid #d8d6cd;border-radius:999px;padding:8px 11px}.muted{color:#6e7d75}.pill{font-size:11px;background:#edf2ec;padding:4px 8px;border-radius:20px;color:#326147}nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #deddd7;display:flex;justify-content:center;z-index:5;padding-bottom:env(safe-area-inset-bottom)}nav button{width:min(25%,190px);border:0;background:white;padding:10px;color:#829087;font-size:19px}nav span{display:block;font-size:10px;margin-top:3px}nav button.active{color:#18583c}@media(max-width:480px){main{padding:16px}.hero{padding:19px}.two{grid-template-columns:1fr 1fr}.actions{flex-wrap:wrap}.actions button{min-width:42%}}
+.forecast-line{margin-top:13px;color:#376b4d;background:#f0f5ed;border-radius:9px;padding:9px;font-size:12px}.weather{min-width:115px}.weather small{line-height:1.6}
+
+.danger-card{border-color:#ead3cf}.danger{width:100%;border:1px solid #b94b3d;background:#fff;color:#a23c31;border-radius:12px;padding:13px;font-weight:800}</style>
+
+<style>
+.groupbar{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px}.group-pill{border:1px solid #cfd8d1;background:#fff;color:#24513b;border-radius:999px;padding:9px 12px;font-weight:700;white-space:nowrap}.group-pill.active{background:#18583c;color:#fff;border-color:#18583c}.friend-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.mini-tag{font-size:11px;background:#edf2ec;color:#326147;border-radius:999px;padding:4px 8px}.settings-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid #ecebe5}.settings-row:last-child{border-bottom:0}.settings-row select,.settings-row input{width:auto;min-width:105px;margin:0}.install-steps{margin:8px 0 0;padding-left:22px;line-height:1.7}.secondary{width:100%;border:1px solid #bfc9c2;background:#fff;color:#18583c;border-radius:12px;padding:13px;font-weight:800}.friend-card-actions{display:flex;gap:8px}.small-btn{border:0;background:#edf2ec;color:#24513b;border-radius:9px;padding:8px 10px;font-weight:700}
+</style></head><body>
+<header><div><span class="eyebrow">YOUR GOLF CALENDAR</span><h1>TeeTime <b>HQ</b></h1></div><button class="icon" id="installBtn">＋</button></header>
+<main>
+<section id="home" class="page active">
+<div class="hero"><div><small>NEXT ROUND</small><h2 id="nextCourse">No tee times yet</h2><p id="nextWhen">Add your first round below.</p></div><div class="weather" id="weather">⛅ --°<small>Forecast</small></div></div>
+<div class="section-title"><h3>Upcoming rounds</h3><button onclick="openRound()">+ Add tee time</button></div>
+<div id="rounds"></div>
+</section>
+<section id="roundPage" class="page"><button class="back" onclick="go('home')">← Back</button><h2>Add Tee Time</h2>
+<form id="roundForm">
+<label>Golf course<input id="course" list="courses" placeholder="Start typing a course name…" required></label>
+<datalist id="courses"><option>Cog Hill Golf & Country Club</option><option>Brookfield Hills Golf Course</option><option>Dubsdread Golf Course</option><option>Ruffled Feathers Golf Club</option><option>Chicago Highlands Club</option><option>Harborside International Golf Center</option></datalist>
+<label>Course city and state <input id="location" placeholder="e.g. Lemont, Illinois" required></label><div class="two"><label>Date<input id="date" type="date" required></label><label>Tee time<input id="time" type="time" required></label></div>
+<div class="two"><label>Players<select id="players"><option>1</option><option>2</option><option>3</option><option selected>4</option></select></label><label>Green fee<input id="fee" type="number" placeholder="$ optional"></label></div>
+<label>Confirmation #<input id="confirm" placeholder="Optional"></label>
+<h3>Invite friends</h3><div id="friendChecks" class="chips"></div>
+<button class="primary" type="submit">Save Tee Time</button></form></section>
+<section id="friends" class="page">
+<div class="section-title"><h2>Golf Friends</h2><button onclick="addFriend()">+ Add Friend</button></div>
+<p class="muted">Organize your playing partners into groups for faster invites.</p>
+<div class="section-title" style="margin-top:12px"><h3>Groups</h3><button onclick="addGroup()">+ New Group</button></div>
+<div id="groupBar" class="groupbar"></div>
+<div id="friendList"></div>
+</section>
+<section id="history" class="page"><h2>Rounds</h2><p class="muted">Your golf schedule and round history.</p><div id="allRounds"></div></section>
+<section id="profile" class="page">
+<h2>Settings</h2>
+<div class="card"><h3>⛳ Golfer Settings</h3>
+<div class="settings-row"><span>Default group size</span><select id="defaultPlayers" onchange="saveSettings()"><option>2</option><option>3</option><option value="4">4</option></select></div>
+<div class="settings-row"><span>Round reminders</span><input id="roundReminder" type="checkbox" onchange="saveSettings()"></div>
+<div class="settings-row"><span>Weather alerts</span><input id="weatherAlert" type="checkbox" onchange="saveSettings()"></div>
+</div>
+<div class="card"><h3>Install TeeTime HQ</h3><div id="installHelp"></div><button id="settingsInstallBtn" class="secondary" onclick="installApp()">Install / Add to Home Screen</button></div>
+<div class="card danger-card"><h3>Reset App Data</h3><p>Clear all saved tee times, friends, groups, and settings on this device.</p><button class="danger" onclick="resetAppData()">Reset App Data</button></div>
+</section>
+</main>
+<nav><button onclick="go('home')" class="active">⌂<span>Home</span></button><button onclick="go('history')">◷<span>Rounds</span></button><button onclick="go('friends')">♟<span>Friends</span></button><button onclick="go('profile')">⚙<span>Settings</span></button></nav>
+<script>const KEY="teetimeHQ.v1";
+let state;
+try { state=JSON.parse(localStorage.getItem(KEY)||"null")||{friends:[],rounds:[]}; }
+catch(e){ state={friends:[],rounds:[]}; }
+if(!Array.isArray(state.friends)) state.friends=[];
+if(!Array.isArray(state.rounds)) state.rounds=[];
+const oldDemo=["Mike","John","Dave"];
+const oldNames=state.friends.map(f=>f&&f.name).filter(Boolean);
+if(oldNames.length===3 && oldDemo.every(n=>oldNames.includes(n))){
+  state.friends=[];
+  localStorage.setItem(KEY,JSON.stringify(state));
+}
+const save=()=>localStorage.setItem(KEY,JSON.stringify(state));
+function go(id){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));let ids=["home","history","friends","profile"],i=ids.indexOf(id);if(i>=0)document.querySelectorAll("nav button")[i].classList.add("active");render()}
+function openRound(){document.getElementById("date").min=new Date().toISOString().slice(0,10);renderFriendChecks();go("roundPage")}
+function renderFriendChecks(){friendChecks.innerHTML=state.friends.map((f,i)=>`<label class="chip"><input style="width:auto;margin:0 5px 0 0" type="checkbox" value="${i}"> ${f.name}</label>`).join("")}
+function initials(n){return n.split(" ").map(x=>x[0]).join("").slice(0,2).toUpperCase()}
+function roundCard(r){let d=new Date(r.date+"T12:00:00"), invited=r.invited||[];return `<div class="card"><div class="round-top"><div><h3>${r.course}</h3><span class="muted">🕘 ${fmtTime(r.time)} · ${r.players} players</span></div><div class="datebox"><small>${d.toLocaleDateString([], {month:"short"}).toUpperCase()}</small><b>${d.getDate()}</b></div></div><div class="forecast-line" id="forecast-${r.id}">🌤️ Checking forecast…</div><div class="players">${invited.map(n=>`<span class="avatar" title="${n}">${initials(n)}</span>`).join("")}<span class="avatar open" title="Open spot">＋</span><span class="muted">${Math.max(0,r.players-invited.length-1)} open</span></div><div class="actions"><button onclick='shareRound(${JSON.stringify(r.id)})'>↗ Invite</button><button onclick='calendarRound(${JSON.stringify(r.id)})'>▣ Calendar</button><button onclick='directions(${JSON.stringify(r.course)})'>⌖ Directions</button></div></div>`}
+function fmtTime(t){let [h,m]=t.split(":").map(Number),a=h>=12?"PM":"AM";return `${h%12||12}:${String(m).padStart(2,"0")} ${a}`}
+function render(){let sorted=[...state.rounds].sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));rounds.innerHTML=sorted.length?sorted.map(roundCard).join(""):`<div class="card"><h3>Ready for your next round?</h3><p class="muted">Add a tee time, invite your golf buddies, and keep everything together.</p><button class="primary" onclick="openRound()">+ Add your first tee time</button></div>`;allRounds.innerHTML=sorted.map(roundCard).join("")||'<p class="muted">No rounds saved yet.</p>';friendList.innerHTML=state.friends.map((f,i)=>`<div class="card"><div class="round-top"><div><b>${f.name}</b><p class="muted" style="margin:4px 0">Golf friend</p></div><button class="back" onclick="removeFriend(${i})">Remove</button></div></div>`).join("");let n=sorted[0];if(n){nextCourse.textContent=n.course;nextWhen.textContent=new Date(n.date+"T12:00").toLocaleDateString([],{weekday:"long",month:"long",day:"numeric"})+" · "+fmtTime(n.time);loadWeather(n)}else{nextCourse.textContent="No tee times yet";nextWhen.textContent="Add your first round below.";weather.innerHTML="⛅ --°<small>Forecast</small>"}sorted.forEach(loadRoundWeather)}
+roundForm.addEventListener("submit",e=>{e.preventDefault();let invited=[...friendChecks.querySelectorAll("input:checked")].map(x=>state.friends[+x.value].name);state.rounds.push({id:Date.now(),course:course.value,location:location.value,date:date.value,time:time.value,players:+players.value,fee:fee.value,confirm:confirm.value,invited});save();roundForm.reset();go("home")});
+function addFriend(){let n=prompt("Friend's name");if(n&&n.trim()){state.friends.push({name:n.trim()});save();render()}}
+function removeFriend(i){state.friends.splice(i,1);save();render()}
+function findRound(id){return state.rounds.find(x=>x.id==id)}
+async function shareRound(id){let r=findRound(id),txt=`Golf? ${r.course} on ${r.date} at ${fmtTime(r.time)}. I have a spot open.`;if(navigator.share)await navigator.share({title:"TeeTime HQ Invite",text:txt});else{await navigator.clipboard.writeText(txt);alert("Invite copied to clipboard.")}}
+function directions(c){window.open("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(c),"_blank")}
+function calendarRound(id){let r=findRound(id),start=r.date.replaceAll("-","")+ "T"+r.time.replace(":","")+"00", [h,m]=r.time.split(":").map(Number),endH=h+4,end=r.date.replaceAll("-","")+"T"+String(endH).padStart(2,"0")+String(m).padStart(2,"0")+"00",ics=`BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+DTSTART:${start}
+DTEND:${end}
+SUMMARY:Golf - ${r.course}
+LOCATION:${r.course}
+DESCRIPTION:Players: ${["You",...(r.invited||[])].join(", ")}
+END:VEVENT
+END:VCALENDAR`;let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([ics],{type:"text/calendar"}));a.download="tee-time.ics";a.click()}
+const wxCache=new Map();
+function weatherIcon(code){if(code===0)return '☀️';if([1,2,3].includes(code))return '⛅';if([45,48].includes(code))return '🌫️';if(code>=95)return '⛈️';if(code>=51&&code<=82)return '🌧️';if(code>=71&&code<=77)return '🌨️';return '🌤️'}
+function windCompass(deg){return ['N','NE','E','SE','S','SW','W','NW'][Math.round(deg/45)%8]}
+async function forecast(r){
+ if(!r.location)throw Error('Add course city/state for weather');
+ const cacheKey=r.location.toLowerCase()+'|'+r.date+'|'+r.time;
+ const saved=wxCache.get(cacheKey);if(saved&&Date.now()-saved.at<20*60*1000)return saved.value;
+ const parts=r.location.split(',').map(x=>x.trim());let query=parts[0];
+ const geoUrl='https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(query)+'&count=10&language=en&format=json';
+ const gr=await fetch(geoUrl);if(!gr.ok)throw Error('Location search unavailable');const gj=await gr.json();
+ let places=gj.results||[];if(parts.length>1){let term=parts.slice(1).join(' ').toLowerCase();places.sort((a,b)=>Number((b.admin1||'').toLowerCase().includes(term))-Number((a.admin1||'').toLowerCase().includes(term)))}
+ const place=places[0];if(!place)throw Error('City not found');
+ const url='https://api.open-meteo.com/v1/forecast?latitude='+place.latitude+'&longitude='+place.longitude+'&hourly=temperature_2m,precipitation_probability,wind_speed_10m,wind_direction_10m,weather_code&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&forecast_days=16';
+ const res=await fetch(url);if(!res.ok)throw Error('Forecast unavailable');const data=await res.json();
+ const hour=r.date+'T'+r.time.slice(0,2)+':00';let i=data.hourly.time.indexOf(hour);
+ if(i<0)throw Error('Forecast available within 16 days of tee time');
+ const h=data.hourly,value={temp:Math.round(h.temperature_2m[i]),rain:h.precipitation_probability[i],wind:Math.round(h.wind_speed_10m[i]),direction:windCompass(h.wind_direction_10m[i]),icon:weatherIcon(h.weather_code[i]),place:place.name};
+ wxCache.set(cacheKey,{at:Date.now(),value});return value;
+}
+async function loadRoundWeather(r){const el=document.getElementById('forecast-'+r.id);if(!el)return;try{const w=await forecast(r);if(el.isConnected)el.textContent=`${w.icon} ${w.temp}°F  ·  🌧️ ${w.rain}% rain  ·  💨 ${w.wind} mph ${w.direction}  ·  ${w.place} area`;}catch(e){if(el.isConnected)el.textContent='🌤️ '+e.message}}
+async function loadWeather(r){const el=document.getElementById('weather');el.innerHTML='⛅ --°<small>Loading forecast…</small>';try{const w=await forecast(r);if(nextCourse.textContent!==r.course)return;el.innerHTML=`${w.icon} ${w.temp}°<small>🌧️ ${w.rain}% · 💨 ${w.wind} mph ${w.direction}</small>`}catch(e){el.innerHTML=`🌤️ --°<small>${e.message}</small>`}}
+
+let deferred;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e});
+installBtn.onclick=async()=>{if(deferred){deferred.prompt();deferred=null}else alert("On iPhone: tap Share, then Add to Home Screen. On Android: use the browser menu and choose Add to Home screen.")};
+render();
+function resetAppData(){
+ if(!confirm("Reset TeeTime HQ? This deletes all saved tee times and friends on this device.")) return;
+ localStorage.removeItem(KEY); location.reload();
+}
+
+// ---- Groups + Settings upgrade ----
+if(!Array.isArray(state.groups)) state.groups=[];
+if(!state.settings) state.settings={defaultPlayers:4,roundReminder:false,weatherAlert:false};
+let activeGroup="all";
+
+function saveState(){ localStorage.setItem(KEY,JSON.stringify(state)); }
+function saveSettings(){
+ state.settings.defaultPlayers=+(document.getElementById("defaultPlayers")?.value||4);
+ state.settings.roundReminder=!!document.getElementById("roundReminder")?.checked;
+ state.settings.weatherAlert=!!document.getElementById("weatherAlert")?.checked;
+ saveState();
+}
+function renderSettings(){
+ const dp=document.getElementById("defaultPlayers"), rr=document.getElementById("roundReminder"), wa=document.getElementById("weatherAlert");
+ if(dp) dp.value=String(state.settings.defaultPlayers||4);
+ if(rr) rr.checked=!!state.settings.roundReminder;
+ if(wa) wa.checked=!!state.settings.weatherAlert;
+ const help=document.getElementById("installHelp");
+ if(help){
+   const ios=/iPad|iPhone|iPod/.test(navigator.userAgent);
+   help.innerHTML=ios
+    ? '<p>On iPhone, Safari installs web apps through the Share menu:</p><ol class="install-steps"><li>Tap the <b>Share</b> button at the bottom of Safari.</li><li>Scroll and tap <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b>.</li></ol>'
+    : '<p>Use the button below. If your browser supports direct installation, it will show the install prompt. Otherwise use your browser menu and choose <b>Add to Home Screen</b>.</p>';
+ }
+}
+function addGroup(){
+ const n=prompt("Group name (example: Weekend Crew)");
+ if(!n||!n.trim()) return;
+ const name=n.trim();
+ if(state.groups.some(g=>g.name.toLowerCase()===name.toLowerCase())) return alert("That group already exists.");
+ state.groups.push({id:Date.now(),name}); saveState(); render();
+}
+function assignGroups(i){
+ const f=state.friends[i];
+ if(!state.groups.length) return alert("Create a group first.");
+ const current=(f.groups||[]).map(String);
+ const list=state.groups.map((g,n)=>`${n+1}. ${g.name}${current.includes(String(g.id))?" ✓":""}`).join("\n");
+ const ans=prompt("Enter group numbers separated by commas.\n\n"+list+"\n\nLeave blank to remove from all groups.");
+ if(ans===null) return;
+ const ids=ans.trim()?ans.split(",").map(x=>state.groups[+x.trim()-1]).filter(Boolean).map(g=>String(g.id)):[];
+ f.groups=[...new Set(ids)]; saveState(); render();
+}
+function selectGroup(id){ activeGroup=id; render(); }
+function selectGroupForRound(id){
+ const g=state.groups.find(x=>String(x.id)===String(id)); if(!g) return;
+ const memberIndexes=state.friends.map((f,i)=>(f.groups||[]).map(String).includes(String(id))?i:-1).filter(i=>i>=0);
+ document.querySelectorAll("#friendChecks input").forEach(cb=>{if(memberIndexes.includes(+cb.value)) cb.checked=true});
+}
+function renderGroupUI(){
+ const bar=document.getElementById("groupBar"); if(!bar) return;
+ bar.innerHTML=`<button class="group-pill ${activeGroup==="all"?"active":""}" onclick="selectGroup('all')">All Friends</button>`+
+ state.groups.map(g=>`<button class="group-pill ${String(activeGroup)===String(g.id)?"active":""}" onclick="selectGroup('${g.id}')">${g.name}</button>`).join("");
+}
+function installApp(){
+ if(deferred){deferred.prompt();deferred=null;return;}
+ const ios=/iPad|iPhone|iPod/.test(navigator.userAgent);
+ alert(ios?"Tap Safari's Share button, then choose Add to Home Screen, then Add.":"Open your browser menu and choose Install App or Add to Home Screen.");
+}
+
+const originalRender=render;
+render=function(){
+ originalRender();
+ renderGroupUI(); renderSettings();
+ const fl=document.getElementById("friendList");
+ if(fl){
+  const visible=state.friends.map((f,i)=>({f,i})).filter(x=>activeGroup==="all"||(x.f.groups||[]).map(String).includes(String(activeGroup)));
+  fl.innerHTML=visible.length?visible.map(({f,i})=>`<div class="card"><div class="round-top"><div><b>${f.name}</b><div class="friend-meta">${(f.groups||[]).map(id=>state.groups.find(g=>String(g.id)===String(id))).filter(Boolean).map(g=>`<span class="mini-tag">${g.name}</span>`).join("")||'<span class="muted">No groups</span>'}</div></div><div class="friend-card-actions"><button class="small-btn" onclick="assignGroups(${i})">Groups</button><button class="small-btn" onclick="removeFriend(${i})">Remove</button></div></div></div>`).join(""):'<div class="card"><p class="muted">No friends here yet. Add a friend or assign someone to this group.</p></div>';
+ }
+}
+renderFriendChecks=function(){
+ const fc=document.getElementById("friendChecks"); if(!fc) return;
+ fc.innerHTML=(state.groups.length?`<div style="width:100%;margin-bottom:8px"><b>Quick add group:</b><div class="groupbar">${state.groups.map(g=>`<button type="button" class="group-pill" onclick="selectGroupForRound('${g.id}')">${g.name}</button>`).join("")}</div></div>`:"")+
+ state.friends.map((f,i)=>`<label class="chip"><input style="width:auto;margin:0 5px 0 0" type="checkbox" value="${i}"> ${f.name}</label>`).join("");
+}
+addFriend=function(){
+ const n=prompt("Friend's name");
+ if(n&&n.trim()){state.friends.push({name:n.trim(),groups:[]});saveState();render();}
+}
+const originalOpenRound=openRound;
+openRound=function(){
+ document.getElementById("date").min=new Date().toISOString().slice(0,10);
+ document.getElementById("players").value=String(state.settings.defaultPlayers||4);
+ renderFriendChecks();go("roundPage");
+}
+const oldReset=resetAppData;
+resetAppData=function(){
+ if(!confirm("Reset TeeTime HQ? This deletes all saved tee times, friends, groups, and settings on this device.")) return;
+ localStorage.removeItem(KEY);location.reload();
+}
+render();
+</script></body></html>
