@@ -1,5 +1,13 @@
 const KEY="teetimeHQ.v1";
 let state=JSON.parse(localStorage.getItem(KEY)||'null')||{friends:[],rounds:[]};
+const DEMO_NAMES=["Mike","John","Dave"];
+if(!localStorage.getItem("teetimeHQ.demoCleanup.v2")){
+  const names=(state.friends||[]).map(f=>f.name);
+  const onlyOriginalDemo=names.length===3 && DEMO_NAMES.every(n=>names.includes(n));
+  if(onlyOriginalDemo) state.friends=[];
+  localStorage.setItem("teetimeHQ.demoCleanup.v2","done");
+  localStorage.setItem(KEY,JSON.stringify(state));
+}
 // One-time cleanup of the original prototype demo friends. Only remove them when
 // the stored friend list exactly matches the untouched demo set.
 const DEMO_NAMES=["Mike","John","Dave"];
