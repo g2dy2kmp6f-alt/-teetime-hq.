@@ -57,3 +57,9 @@ async function loadWeather(r){const el=document.getElementById('weather');el.inn
 
 let deferred;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e});installBtn.onclick=async()=>{if(deferred){deferred.prompt();deferred=null}else alert("On iPhone: tap Share, then Add to Home Screen. On Android: use your browser menu and choose Install/Add to Home screen.")};
 if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js");render();
+function resetAppData(){
+  if(!confirm("Reset TeeTime HQ? This will delete all saved tee times, friends, and app data on this device.")) return;
+  Object.keys(localStorage).filter(k=>k.startsWith("teetimeHQ")).forEach(k=>localStorage.removeItem(k));
+  if("caches" in window) caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))).finally(()=>location.reload());
+  else location.reload();
+}
