@@ -1,5 +1,15 @@
 const KEY="teetimeHQ.v1";
-let state=JSON.parse(localStorage.getItem(KEY)||'null')||{friends:[{name:"Mike",status:"Confirmed"},{name:"John",status:"Pending"},{name:"Dave",status:"Confirmed"}],rounds:[]};
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||{friends:[],rounds:[]};
+// One-time cleanup of the original prototype demo friends. Only remove them when
+// the stored friend list exactly matches the untouched demo set.
+const DEMO_NAMES=["Mike","John","Dave"];
+if(!localStorage.getItem("teetimeHQ.demoCleanup.v1") && Array.isArray(state.friends)){
+  const names=state.friends.map(f=>f.name);
+  const untouchedDemo=names.length===3 && DEMO_NAMES.every(n=>names.includes(n));
+  if(untouchedDemo) state.friends=[];
+  localStorage.setItem("teetimeHQ.demoCleanup.v1","done");
+  localStorage.setItem(KEY,JSON.stringify(state));
+}
 const save=()=>localStorage.setItem(KEY,JSON.stringify(state));
 function go(id){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));let ids=["home","history","friends","profile"],i=ids.indexOf(id);if(i>=0)document.querySelectorAll("nav button")[i].classList.add("active");render()}
 function openRound(){document.getElementById("date").min=new Date().toISOString().slice(0,10);renderFriendChecks();go("roundPage")}
