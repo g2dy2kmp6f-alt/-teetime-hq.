@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#123c2b"><title>TeeTime HQ</title>
+<link rel="manifest" href="manifest.json"><link rel="stylesheet" href="styles.css">
+</head><body>
+<header><div><span class="eyebrow">YOUR GOLF CALENDAR</span><h1>TeeTime <b>HQ</b></h1></div><button class="icon" id="installBtn">＋</button></header>
+<main>
+<section id="home" class="page active">
+<div class="hero"><div><small>NEXT ROUND</small><h2 id="nextCourse">No tee times yet</h2><p id="nextWhen">Add your first round below.</p></div><div class="weather" id="weather">⛅ --°<small>Forecast</small></div></div>
+<div class="section-title"><h3>Upcoming rounds</h3><button onclick="openRound()">+ Add tee time</button></div>
+<div id="rounds"></div>
+</section>
+<section id="roundPage" class="page"><button class="back" onclick="go('home')">← Back</button><h2>Add Tee Time</h2>
+<form id="roundForm">
+<label>Golf course<input id="course" list="courses" placeholder="Start typing a course name…" required></label>
+<datalist id="courses"><option>Cog Hill Golf & Country Club</option><option>Brookfield Hills Golf Course</option><option>Dubsdread Golf Course</option><option>Ruffled Feathers Golf Club</option><option>Chicago Highlands Club</option><option>Harborside International Golf Center</option></datalist>
+<label>Course city and state <input id="location" placeholder="e.g. Lemont, Illinois" required></label><div class="two"><label>Date<input id="date" type="date" required></label><label>Tee time<input id="time" type="time" required></label></div>
+<div class="two"><label>Players<select id="players"><option>1</option><option>2</option><option>3</option><option selected>4</option></select></label><label>Green fee<input id="fee" type="number" placeholder="$ optional"></label></div>
+<label>Confirmation #<input id="confirm" placeholder="Optional"></label>
+<h3>Invite friends</h3><div id="friendChecks" class="chips"></div>
+<button class="primary" type="submit">Save Tee Time</button></form></section>
+<section id="friends" class="page"><div class="section-title"><h2>Golf Friends</h2><button onclick="addFriend()">+ Add</button></div><p class="muted">Your regular playing partners, ready to invite.</p><div id="friendList"></div></section>
+<section id="history" class="page"><h2>Rounds</h2><p class="muted">Your golf schedule and round history.</p><div id="allRounds"></div></section>
+<section id="profile" class="page"><h2>Profile</h2><div class="card"><h3>⛳ TeeTime HQ</h3><p>Organize golf. Fill your foursome. Never lose track of a tee time.</p></div><div class="card"><h3>Reminders</h3><p>Round reminders <span class="pill">Coming next</span></p><p>Weather alerts <span class="pill">Coming next</span></p></div><div class="card"><h3>Install App</h3><p>Add TeeTime HQ to your phone's Home Screen for an app-like experience.</p></div></section>
+</main>
+<nav><button onclick="go('home')" class="active">⌂<span>Home</span></button><button onclick="go('history')">◷<span>Rounds</span></button><button onclick="go('friends')">♟<span>Friends</span></button><button onclick="go('profile')">●<span>Profile</span></button></nav>
+<script src="app.js"></script></body></html>

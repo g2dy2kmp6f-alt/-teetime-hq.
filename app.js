@@ -1,0 +1,41 @@
+const KEY="teetimeHQ.v1";
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||{friends:[{name:"Mike",status:"Confirmed"},{name:"John",status:"Pending"},{name:"Dave",status:"Confirmed"}],rounds:[]};
+const save=()=>localStorage.setItem(KEY,JSON.stringify(state));
+function go(id){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));let ids=["home","history","friends","profile"],i=ids.indexOf(id);if(i>=0)document.querySelectorAll("nav button")[i].classList.add("active");render()}
+function openRound(){document.getElementById("date").min=new Date().toISOString().slice(0,10);renderFriendChecks();go("roundPage")}
+function renderFriendChecks(){friendChecks.innerHTML=state.friends.map((f,i)=>`<label class="chip"><input style="width:auto;margin:0 5px 0 0" type="checkbox" value="${i}"> ${f.name}</label>`).join("")}
+function initials(n){return n.split(" ").map(x=>x[0]).join("").slice(0,2).toUpperCase()}
+function roundCard(r){let d=new Date(r.date+"T12:00:00"), invited=r.invited||[];return `<div class="card"><div class="round-top"><div><h3>${r.course}</h3><span class="muted">🕘 ${fmtTime(r.time)} · ${r.players} players</span></div><div class="datebox"><small>${d.toLocaleDateString([], {month:"short"}).toUpperCase()}</small><b>${d.getDate()}</b></div></div><div class="forecast-line" id="forecast-${r.id}">🌤️ Checking forecast…</div><div class="players">${invited.map(n=>`<span class="avatar" title="${n}">${initials(n)}</span>`).join("")}<span class="avatar open" title="Open spot">＋</span><span class="muted">${Math.max(0,r.players-invited.length-1)} open</span></div><div class="actions"><button onclick='shareRound(${JSON.stringify(r.id)})'>↗ Invite</button><button onclick='calendarRound(${JSON.stringify(r.id)})'>▣ Calendar</button><button onclick='directions(${JSON.stringify(r.course)})'>⌖ Directions</button></div></div>`}
+function fmtTime(t){let [h,m]=t.split(":").map(Number),a=h>=12?"PM":"AM";return `${h%12||12}:${String(m).padStart(2,"0")} ${a}`}
+function render(){let sorted=[...state.rounds].sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));rounds.innerHTML=sorted.length?sorted.map(roundCard).join(""):`<div class="card"><h3>Ready for your next round?</h3><p class="muted">Add a tee time, invite your golf buddies, and keep everything together.</p><button class="primary" onclick="openRound()">+ Add your first tee time</button></div>`;allRounds.innerHTML=sorted.map(roundCard).join("")||'<p class="muted">No rounds saved yet.</p>';friendList.innerHTML=state.friends.map((f,i)=>`<div class="card"><div class="round-top"><div><b>${f.name}</b><p class="muted" style="margin:4px 0">Golf friend</p></div><button class="back" onclick="removeFriend(${i})">Remove</button></div></div>`).join("");let n=sorted[0];if(n){nextCourse.textContent=n.course;nextWhen.textContent=new Date(n.date+"T12:00").toLocaleDateString([],{weekday:"long",month:"long",day:"numeric"})+" · "+fmtTime(n.time);loadWeather(n)}else{nextCourse.textContent="No tee times yet";nextWhen.textContent="Add your first round below.";weather.innerHTML="⛅ --°<small>Forecast</small>"}sorted.forEach(loadRoundWeather)}
+roundForm.addEventListener("submit",e=>{e.preventDefault();let invited=[...friendChecks.querySelectorAll("input:checked")].map(x=>state.friends[+x.value].name);state.rounds.push({id:Date.now(),course:course.value,location:location.value,date:date.value,time:time.value,players:+players.value,fee:fee.value,confirm:confirm.value,invited});save();roundForm.reset();go("home")});
+function addFriend(){let n=prompt("Friend's name");if(n&&n.trim()){state.friends.push({name:n.trim()});save();render()}}
+function removeFriend(i){state.friends.splice(i,1);save();render()}
+function findRound(id){return state.rounds.find(x=>x.id==id)}
+async function shareRound(id){let r=findRound(id),txt=`Golf? ${r.course} on ${r.date} at ${fmtTime(r.time)}. I have a spot open.`;if(navigator.share)await navigator.share({title:"TeeTime HQ Invite",text:txt});else{await navigator.clipboard.writeText(txt);alert("Invite copied to clipboard.")}}
+function directions(c){window.open("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(c),"_blank")}
+function calendarRound(id){let r=findRound(id),start=r.date.replaceAll("-","")+ "T"+r.time.replace(":","")+"00", [h,m]=r.time.split(":").map(Number),endH=h+4,end=r.date.replaceAll("-","")+"T"+String(endH).padStart(2,"0")+String(m).padStart(2,"0")+"00",ics=`BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:${start}\nDTEND:${end}\nSUMMARY:Golf - ${r.course}\nLOCATION:${r.course}\nDESCRIPTION:Players: ${["You",...(r.invited||[])].join(", ")}\nEND:VEVENT\nEND:VCALENDAR`;let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([ics],{type:"text/calendar"}));a.download="tee-time.ics";a.click()}
+const wxCache=new Map();
+function weatherIcon(code){if(code===0)return '☀️';if([1,2,3].includes(code))return '⛅';if([45,48].includes(code))return '🌫️';if(code>=95)return '⛈️';if(code>=51&&code<=82)return '🌧️';if(code>=71&&code<=77)return '🌨️';return '🌤️'}
+function windCompass(deg){return ['N','NE','E','SE','S','SW','W','NW'][Math.round(deg/45)%8]}
+async function forecast(r){
+ if(!r.location)throw Error('Add course city/state for weather');
+ const cacheKey=r.location.toLowerCase()+'|'+r.date+'|'+r.time;
+ const saved=wxCache.get(cacheKey);if(saved&&Date.now()-saved.at<20*60*1000)return saved.value;
+ const parts=r.location.split(',').map(x=>x.trim());let query=parts[0];
+ const geoUrl='https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(query)+'&count=10&language=en&format=json';
+ const gr=await fetch(geoUrl);if(!gr.ok)throw Error('Location search unavailable');const gj=await gr.json();
+ let places=gj.results||[];if(parts.length>1){let term=parts.slice(1).join(' ').toLowerCase();places.sort((a,b)=>Number((b.admin1||'').toLowerCase().includes(term))-Number((a.admin1||'').toLowerCase().includes(term)))}
+ const place=places[0];if(!place)throw Error('City not found');
+ const url='https://api.open-meteo.com/v1/forecast?latitude='+place.latitude+'&longitude='+place.longitude+'&hourly=temperature_2m,precipitation_probability,wind_speed_10m,wind_direction_10m,weather_code&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&forecast_days=16';
+ const res=await fetch(url);if(!res.ok)throw Error('Forecast unavailable');const data=await res.json();
+ const hour=r.date+'T'+r.time.slice(0,2)+':00';let i=data.hourly.time.indexOf(hour);
+ if(i<0)throw Error('Forecast available within 16 days of tee time');
+ const h=data.hourly,value={temp:Math.round(h.temperature_2m[i]),rain:h.precipitation_probability[i],wind:Math.round(h.wind_speed_10m[i]),direction:windCompass(h.wind_direction_10m[i]),icon:weatherIcon(h.weather_code[i]),place:place.name};
+ wxCache.set(cacheKey,{at:Date.now(),value});return value;
+}
+async function loadRoundWeather(r){const el=document.getElementById('forecast-'+r.id);if(!el)return;try{const w=await forecast(r);if(el.isConnected)el.textContent=`${w.icon} ${w.temp}°F  ·  🌧️ ${w.rain}% rain  ·  💨 ${w.wind} mph ${w.direction}  ·  ${w.place} area`;}catch(e){if(el.isConnected)el.textContent='🌤️ '+e.message}}
+async function loadWeather(r){const el=document.getElementById('weather');el.innerHTML='⛅ --°<small>Loading forecast…</small>';try{const w=await forecast(r);if(nextCourse.textContent!==r.course)return;el.innerHTML=`${w.icon} ${w.temp}°<small>🌧️ ${w.rain}% · 💨 ${w.wind} mph ${w.direction}</small>`}catch(e){el.innerHTML=`🌤️ --°<small>${e.message}</small>`}}
+
+let deferred;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e});installBtn.onclick=async()=>{if(deferred){deferred.prompt();deferred=null}else alert("On iPhone: tap Share, then Add to Home Screen. On Android: use your browser menu and choose Install/Add to Home screen.")};
+if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js");render();
